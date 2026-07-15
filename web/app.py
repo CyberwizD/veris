@@ -82,9 +82,25 @@ def _synthetic_demo_controls(api_base_url: str) -> dict[str, Any] | None:
                     f"{api_base_url}/api/demo",
                     params={"records": records, "seed": int(seed)},
                 )
+                # Store all records for download
+                if "all_records" in st.session_state.report:
+                    st.session_state.demo_records = st.session_state.report[
+                        "all_records"
+                    ]
             except requests.RequestException as exc:
                 st.error(f"Could not reach the Reflex API at `{api_base_url}`: {exc}")
                 st.session_state.report = None
+
+    # Add download button if records are available
+    if "demo_records" in st.session_state and st.session_state.demo_records:
+        csv_data = _records_to_csv(st.session_state.demo_records)
+        st.sidebar.download_button(
+            label="Download CSV",
+            data=csv_data,
+            file_name=f"veris_demo_records_{records}_{seed}.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
 
     return st.session_state.get("report")
 
@@ -199,10 +215,17 @@ def _render_empty_state(api_base_url: str) -> None:
     st.code(f"{api_base_url}/api/demo?records=750&seed=42")
 
 
+def _records_to_csv(records: list[dict[str, Any]]) -> str:
+    """Convert records list to CSV string."""
+    df = pd.DataFrame(records)
+    return df.to_csv(index=False)
+
+
 def _read_uploaded_records(uploaded: Any) -> list[dict[str, Any]]:
     if uploaded.name.lower().endswith(".csv"):
         df = pd.read_csv(uploaded)
-        return df.where(pd.notna(df), None).to_dict(orient="records")
+        df = df.replace([float("nan"), float("inf"), float("-inf")], None)
+        return df.to_dict(orient="records")
 
     try:
         payload = json.load(uploaded)

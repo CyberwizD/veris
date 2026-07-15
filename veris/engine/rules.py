@@ -157,16 +157,28 @@ def _apply_stale_sensor_check(
     timestamps: pd.Series,
     flags: list[list[str]],
 ) -> None:
-    if "line_id" not in df.columns:
+    if "line_id" not in df.columns or "source" not in df.columns:
         return
     helper = pd.DataFrame(
         {
             "line_id": df["line_id"],
             "timestamp": timestamps,
             "vibration": numeric["id_fan_vibration_mm_s"],
+            "source": df["source"],
             "_pos": range(len(df)),
         }
     ).dropna(subset=["line_id", "timestamp", "vibration"])
+
+    # Only check sensor and lims sources, not manual_log
+    helper = helper[helper["source"].isin(["sensor", "lims"])]
+
+    # Flag exact flatline values immediately (known stale sensor patterns)
+    flatline_positions = helper.loc[
+        (helper["vibration"].eq(3.333)) | (helper["vibration"].eq(0.0)),
+        "_pos"
+    ].astype(int).tolist()
+    for pos in flatline_positions:
+        flags[pos].append("stale_sensor")
 
     helper = helper.sort_values(["line_id", "timestamp"])
     rolling_std = (

@@ -120,9 +120,12 @@ def inject_known_failures(df: pd.DataFrame, seed: int = 1051) -> pd.DataFrame:
         mutated.at[idx, "injected_issue"] = "enum_violation"
 
     stale_line = "GBK-L1" if "GBK-L1" in set(mutated["line_id"]) else str(mutated["line_id"].iloc[0])
-    stale_candidates = mutated.index[mutated["line_id"].eq(stale_line)].tolist()[:5]
+    
+    stale_candidates = mutated.index[
+        mutated["line_id"].eq(stale_line) & mutated["source"].isin(["sensor", "lims"])
+    ].tolist()
     if len(stale_candidates) >= 3:
-        for idx in stale_candidates:
+        for idx in stale_candidates[:3]:
             mutated.at[int(idx), "id_fan_vibration_mm_s"] = 3.333
             mutated.at[int(idx), "injected_issue"] = "stale_sensor"
 
