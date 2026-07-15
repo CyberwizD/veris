@@ -248,13 +248,20 @@ def _apply_style() -> None:
             max-width: 1280px;
         }
         div[data-testid="stMetric"] {
-            border: 1px solid #d8dee4;
+            border: 1px solid #2a3442;
             border-radius: 8px;
             padding: 0.9rem 1rem;
-            background: #ffffff;
+            background: #111827;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
         }
         div[data-testid="stMetric"] label {
-            color: #57606a;
+            color: #aab4c3;
+        }
+        div[data-testid="stMetricValue"] {
+            color: #f5f7fb;
+        }
+        div[data-testid="stMetricDelta"] {
+            color: #39d98a;
         }
         </style>
         """,
