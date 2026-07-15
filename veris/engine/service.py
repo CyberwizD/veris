@@ -39,6 +39,8 @@ def _report_from_validated(validated: pd.DataFrame, rule_counts: dict[str, int])
     failed = validated[validated["validation_status"].eq("failed")].copy()
     failed = failed.sort_values(["flag_count", "record_id"], ascending=[False, True])
 
+    passed = validated[validated["validation_status"].eq("passed")].copy()
+
     report = {
         "metadata": {
             "product": "Veris",
@@ -57,7 +59,7 @@ def _report_from_validated(validated: pd.DataFrame, rule_counts: dict[str, int])
         "rule_counts": {key: int(value) for key, value in rule_counts.items()},
         "batch_summary": summarize_batches(validated),
         "failed_records": _records_for_api(failed.head(50)),
-        "sample_records": _records_for_api(validated.head(12)),
+        "sample_records": _records_for_api(passed.head(12)),
     }
     return report
 
