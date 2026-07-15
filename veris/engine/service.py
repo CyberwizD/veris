@@ -60,6 +60,7 @@ def _report_from_validated(validated: pd.DataFrame, rule_counts: dict[str, int])
         "batch_summary": summarize_batches(validated),
         "failed_records": _records_for_api(failed.head(50)),
         "sample_records": _records_for_api(passed.head(12)),
+        "all_records": _records_for_api(validated),
     }
     return report
 
