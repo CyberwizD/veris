@@ -23,7 +23,9 @@ def index() -> rx.Component:
                 "and Data Quality Score reporting."
             ),
             rx.code("/api/health"),
+            rx.code("/health"),
             rx.code("/api/demo?records=750&seed=42"),
+            rx.code("/api/v1/demo?records=750&seed=42"),
             rx.code("/api/validate"),
             spacing="4",
             align="start",
