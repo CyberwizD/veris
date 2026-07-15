@@ -202,7 +202,8 @@ def _render_empty_state(api_base_url: str) -> None:
 def _read_uploaded_records(uploaded: Any) -> list[dict[str, Any]]:
     if uploaded.name.lower().endswith(".csv"):
         df = pd.read_csv(uploaded)
-        return df.where(pd.notna(df), None).to_dict(orient="records")
+        df = df.replace([float("nan"), float("inf"), float("-inf")], None)
+        return df.to_dict(orient="records")
 
     try:
         payload = json.load(uploaded)
