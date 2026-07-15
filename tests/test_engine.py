@@ -83,6 +83,10 @@ def test_demo_report_is_api_serializable_and_scores_batch() -> None:
 def test_demo_endpoint_returns_streamlit_ready_payload() -> None:
     client = TestClient(api)
 
+    health = client.get("/health")
+    assert health.status_code == 200
+    assert health.json()["backend"] == "reflex"
+
     response = client.get("/api/demo", params={"records": 100, "seed": 13})
 
     assert response.status_code == 200
@@ -90,3 +94,7 @@ def test_demo_endpoint_returns_streamlit_ready_payload() -> None:
     assert payload["metadata"]["product"] == "Veris"
     assert payload["quality"]["counts"]["passed_records"] > 0
     assert payload["failed_records"]
+
+    versioned = client.get("/api/v1/demo", params={"records": 100, "seed": 13})
+    assert versioned.status_code == 200
+    assert versioned.json()["quality"]["dqs"] == payload["quality"]["dqs"]
