@@ -2,6 +2,7 @@
 assets/external/
 __pycache__/
 .web
+.env
 *.py[cod]
 *.db
 *.log
